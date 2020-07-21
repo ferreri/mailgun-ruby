@@ -74,7 +74,7 @@ end
 Or have the initializer read your environment setting if you prefer.
 
 To use as the ActionMailer delivery method, add this to your `config/environments/whatever.rb`
-and replace `api-myapikey` and `mydomain.com` with your secret API key and domain, respectively:
+and replace `api-myapikey` and `mydomain.com` with your secret API key and default domain, respectively:
 ```ruby
   config.action_mailer.delivery_method = :mailgun
   config.action_mailer.mailgun_settings = {
@@ -82,6 +82,17 @@ and replace `api-myapikey` and `mydomain.com` with your secret API key and domai
     domain: 'mydomain.com',
     # api_host: 'api.eu.mailgun.net'  # Uncomment this line for EU region domains
   }
+```
+
+To specify Mailgun domain for a message:
+```ruby
+class UserMailer < ApplicationMailer
+  def welcome_email
+    mail(to: params[:to], subject: "Welcome!").tap do |message|
+      message.mailgun_domain = "seconddomain.com"
+    end
+  end
+end   
 ```
 
 To specify Mailgun options such as campaign or tags:

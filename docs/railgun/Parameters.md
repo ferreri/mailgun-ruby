@@ -25,6 +25,22 @@ message.mailgun_options ||= {
 }
 ```
 
+## Domain
+
+See [Mailgun Docs | Sending](https://documentation.mailgun.com/en/latest/api-sending.html#sending) for more information on domain usage.
+
+---
+
+To set domain on a message:
+
+```ruby
+# app/controllers/some_controller.rb
+
+message = YourMailer.your_message(@args)
+
+message.mailgun_domain = "example.com"
+```
+
 
 ## Variables
 

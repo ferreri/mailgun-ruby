@@ -46,7 +46,8 @@ module Railgun
 
     def deliver!(mail)
       mg_message = Railgun.transform_for_mailgun(mail)
-      response = @mg_client.send_message(@domain, mg_message)
+      domain = mail.mailgun_domain || @domain
+      response = @mg_client.send_message(domain, mg_message)
 
       if response.code == 200 then
         mg_id = response.to_h['id']

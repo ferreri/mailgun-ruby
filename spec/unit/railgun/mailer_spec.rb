@@ -34,15 +34,47 @@ class UnitTestMailer < ActionMailer::Base
 end
 
 describe 'Railgun::Mailer' do
-
-  it 'has a mailgun_client property which returns a Mailgun::Client' do
-    config = {
-      api_key:  {},
-      domain:   {}
+  context 'configuration' do
+    let(:config) {
+      {
+        api_key: {},
+        domain: "example.com"
+      }
     }
-    @mailer_obj = Railgun::Mailer.new(config)
 
-    expect(@mailer_obj.mailgun_client).to be_a(Mailgun::Client)
+    let(:mock_response) {
+      Mailgun::Response.from_hash({
+        body: '{"id": "testid", "message": "message"}',
+        code: 200,
+      })
+    }
+
+    it 'has a mailgun_client property which returns a Mailgun::Client' do
+      @mailer_obj = Railgun::Mailer.new(config)
+
+      expect(@mailer_obj.mailgun_client).to be_a(Mailgun::Client)
+    end
+
+    it 'uses configured domain' do
+      mailer = Railgun::Mailer.new(config)
+      message = UnitTestMailer.plain_message('test@example.org', 'Test!', {})
+      
+      expect(mailer.mailgun_client).to receive(:send_message)
+        .with("example.com", any_args)
+        .and_return(mock_response)
+      mailer.deliver!(message)
+    end
+
+    it 'changes message domain' do
+      mailer = Railgun::Mailer.new(config)
+      message = UnitTestMailer.plain_message('test@example.org', 'Test!', {})
+      message.mailgun_domain = 'anotherexample.com'
+
+      expect(mailer.mailgun_client).to receive(:send_message)
+        .with("anotherexample.com", any_args)
+        .and_return(mock_response)
+      mailer.deliver!(message)
+    end
   end
 
   it 'properly creates a message body' do
